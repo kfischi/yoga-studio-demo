@@ -1,8 +1,7 @@
-```toml
 [build]
-  publish = "."    # פרסום משורש הפרויקט
+  publish = "."
 
-# הפניות ל-/admin (ללא או עם סלאש ועם כל תת־נתיב)
+# הפניות ל-/admin (ללא או עם סלאש ועם תת־נתיבים)
 [[redirects]]
   from = "/admin"
   to = "/admin/index.html"
