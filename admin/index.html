@@ -3,49 +3,61 @@
 <head>
   <meta charset="utf-8">
   <title>Content Manager</title>
-  <!-- Load Netlify CMS core -->
-  <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
-  <!-- Load Netlify Identity widget -->
+  <!-- Netlify Identity widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Netlify CMS core -->
+  <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
+  <style>
+    /* וודא שה־CMS מתפרש במלוא המסך */
+    body, html { margin:0; height:100%; }
+    #nc-root { height:100%; }
+  </style>
 </head>
 <body>
+  <div id="nc-root"></div>
   <script>
-    // Initialize Identity and then CMS
-    document.addEventListener('DOMContentLoaded', function() {
-      if (window.netlifyIdentity) {
-        window.netlifyIdentity.on('init', user => {
-          // Once identity is ready, init CMS
-          CMS.init({
-            config: {
-              backend: { name: 'git-gateway', branch: 'main' },
-              media_folder: 'static/uploads',
-              public_folder: '/uploads',
-              collections: [
+    // 1. אתחול Netlify Identity
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.init();
+    } else {
+      console.error('Netlify Identity not loaded');
+    }
+
+    // 2. רק אחרי שה־Identity מוכן, אתחול ה-CMS
+    window.netlifyIdentity.on('login', () => {
+      CMS.init({
+        config: {
+          backend: { name: 'git-gateway', branch: 'main' },
+          media_folder: 'static/uploads',
+          public_folder: '/uploads',
+          collections: [
+            {
+              name: 'home',
+              label: 'Homepage',
+              files: [
                 {
-                  name: 'home',
-                  label: 'Homepage',
-                  files: [
-                    {
-                      label: 'Hero Section',
-                      name: 'hero',
-                      file: 'content/hero.md',
-                      fields: [
-                        { label: 'Title', name: 'title', widget: 'string' },
-                        { label: 'Subtitle', name: 'subtitle', widget: 'string' },
-                        { label: 'Description', name: 'description', widget: 'text' },
-                        { label: 'Button Text', name: 'btn_text', widget: 'string' },
-                        { label: 'Button Link', name: 'btn_link', widget: 'string' }
-                      ]
-                    }
+                  label: 'Hero Section',
+                  name: 'hero',
+                  file: 'content/hero.md',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Subtitle', name: 'subtitle', widget: 'string' },
+                    { label: 'Description', name: 'description', widget: 'text' },
+                    { label: 'Button Text', name: 'btn_text', widget: 'string' },
+                    { label: 'Button Link', name: 'btn_link', widget: 'string' }
                   ]
                 }
               ]
             }
-          });
-        });
-        window.netlifyIdentity.init();
-      } else {
-        console.error('Netlify Identity not loaded');
+          ]
+        }
+      });
+    });
+
+    // 3. אם המשתמש כבר מחובר, אתחול מיד
+    window.netlifyIdentity.on('init', user => {
+      if (user) {
+        CMS.init({ /* כאמור למעלה */ });
       }
     });
   </script>
