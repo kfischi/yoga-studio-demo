@@ -3,47 +3,49 @@
 <head>
   <meta charset="utf-8">
   <title>Content Manager</title>
-  <!-- Netlify Identity widget -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Netlify CMS core -->
+  <!-- Load Netlify CMS core -->
   <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
+  <!-- Load Netlify Identity widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <!-- Initialize Identity widget first -->
   <script>
-    // Start Netlify Identity
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.init();
-    }
-  </script>
-
-  <!-- Initialize CMS after Identity -->
-  <script>
-    CMS.init({
-      config: {
-        backend: { name: 'git-gateway', branch: 'main' },
-        media_folder: 'static/uploads',
-        public_folder: '/uploads',
-        collections: [
-          {
-            name: 'home',
-            label: 'Homepage',
-            files: [
-              {
-                label: 'Hero Section',
-                name: 'hero',
-                file: 'content/hero.md',
-                fields: [
-                  { label: 'Title', name: 'title', widget: 'string' },
-                  { label: 'Subtitle', name: 'subtitle', widget: 'string' },
-                  { label: 'Description', name: 'description', widget: 'text' },
-                  { label: 'Button Text', name: 'btn_text', widget: 'string' },
-                  { label: 'Button Link', name: 'btn_link', widget: 'string' }
-                ]
-              }
-            ]
-          }
-        ]
+    // Initialize Identity and then CMS
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on('init', user => {
+          // Once identity is ready, init CMS
+          CMS.init({
+            config: {
+              backend: { name: 'git-gateway', branch: 'main' },
+              media_folder: 'static/uploads',
+              public_folder: '/uploads',
+              collections: [
+                {
+                  name: 'home',
+                  label: 'Homepage',
+                  files: [
+                    {
+                      label: 'Hero Section',
+                      name: 'hero',
+                      file: 'content/hero.md',
+                      fields: [
+                        { label: 'Title', name: 'title', widget: 'string' },
+                        { label: 'Subtitle', name: 'subtitle', widget: 'string' },
+                        { label: 'Description', name: 'description', widget: 'text' },
+                        { label: 'Button Text', name: 'btn_text', widget: 'string' },
+                        { label: 'Button Link', name: 'btn_link', widget: 'string' }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          });
+        });
+        window.netlifyIdentity.init();
+      } else {
+        console.error('Netlify Identity not loaded');
       }
     });
   </script>
