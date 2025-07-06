@@ -3,9 +3,40 @@
 <head>
   <meta charset="utf-8">
   <title>Content Manager</title>
+  <!-- עיקוף טעינה אוטומטית -->
+  <script>
+    window.CMS_MANUAL_INIT = true;
+  </script>
   <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
 </head>
 <body>
-  <!-- Netlify CMS יטען כאן את הממשק -->
+  <!-- כאן נטען ה־CMS -->
+  <script>
+    CMS.init({
+      config: {
+        backend: { name: 'git-gateway', branch: 'main' },
+        media_folder: 'static/uploads',
+        public_folder: '/uploads',
+        collections: [
+          {
+            name: 'home', label: 'Homepage', files: [
+              {
+                label: 'Hero Section',
+                name: 'hero',
+                file: 'content/hero.md',
+                fields: [
+                  { label: 'Title', name: 'title', widget: 'string' },
+                  { label: 'Subtitle', name: 'subtitle', widget: 'string' },
+                  { label: 'Description', name: 'description', widget: 'text' },
+                  { label: 'Button Text', name: 'btn_text', widget: 'string' },
+                  { label: 'Button Link', name: 'btn_link', widget: 'string' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  </script>
 </body>
 </html>
