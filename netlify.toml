@@ -1,10 +1,9 @@
-# הגדרת ספריית פרסום (Publish directory) לשורש הפרויקט
-[build]
-  publish = "."
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200
 
-# כל קריאה ל-/admin תנותב ל-admin/index.html עם סטטוס 200
 [[redirects]]
   from = "/admin/*"
   to = "/admin/index.html"
   status = 200
-
