@@ -3,14 +3,21 @@
 <head>
   <meta charset="utf-8">
   <title>Content Manager</title>
-  <!-- עיקוף טעינה אוטומטית -->
-  <script>
-    window.CMS_MANUAL_INIT = true;
-  </script>
+  <!-- Netlify Identity widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Netlify CMS core -->
   <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
 </head>
 <body>
-  <!-- כאן נטען ה־CMS -->
+  <!-- Initialize Identity widget first -->
+  <script>
+    // Start Netlify Identity
+    if (window.netlifyIdentity) {
+      window.netlifyIdentity.init();
+    }
+  </script>
+
+  <!-- Initialize CMS after Identity -->
   <script>
     CMS.init({
       config: {
@@ -19,7 +26,9 @@
         public_folder: '/uploads',
         collections: [
           {
-            name: 'home', label: 'Homepage', files: [
+            name: 'home',
+            label: 'Homepage',
+            files: [
               {
                 label: 'Hero Section',
                 name: 'hero',
