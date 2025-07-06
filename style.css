@@ -1,1 +1,166 @@
+# תצורת Netlify CMS מלאה
+
+## 1. `netlify.toml` (בספריית השורש)
+```toml
+[build]
+  publish = "."    # פרסום משורש הפרויקט
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
+```
+
+## 2. מבנה התיקיות (ב־repo שלך)
+להלן המבנה הנכון שצריך להיות ב־root של הפרויקט שלך, לא בתוך `content/`:
+```
+/ (root)
+├── netlify.toml         ← קובץ ההפניות ל־/admin
+├── index.html           ← דף הבית הראשי של האתר
+├── style.css            ← קובצי CSS אחרים (ראו להלן)
+├── admin/               ← תיקיית ה־CMS (באותה רמה)
+│   ├── index.html       ← ממשק ה־CMS
+│   └── config.yml       ← הגדרות ה־CMS ב־YAML
+└── content/             ← תיקיית התוכן (Markdown בלבד)
+    └── hero.md          ← תוכן העריכה
+```
+
+## 3. תוכן `style.css`
+בקובץ `style.css` שבשורש הפרויקט תכלול את הסגנונות העיקריים של האתר, למשל:
+```css
+:root {
+  --primary: #43cea2;
+  --secondary: #19547b;
+  --text-dark: #2c3e50;
+  --text-light: #7f8c8d;
+  --white: #ffffff;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Heebo', sans-serif;
+  line-height: 1.6;
+  color: var(--text-dark);
+  background-color: var(--white);
+  direction: rtl;
+}
+
+/* דוגמה לסגנון הכפתורים */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+}
+```
+
+```
+/ (root)
+├── netlify.toml         ← קובץ ההפניות ל־/admin
+├── index.html           ← דף הבית הראשי של האתר
+├── style.css            ← קבצי CSS אחרים
+├── admin/               ← תיקיית ה־CMS (באותה רמה)
+│   ├── index.html       ← ממשק ה־CMS
+│   └── config.yml       ← הגדרות ה־CMS ב־YAML
+└── content/             ← תיקיית התוכן (Markdown בלבד)
+    └── hero.md          ← תוכן העריכה
+```
+
+> **שים לב:** אם קבצים כמו `netlify.toml`, `index.html` (של האתר הראשי), או `style.css` נמצאים בתוך `content/`, יש **להעביר** אותם חזרה ל־root. תיקיית `content/` צריכה להכיל רק את קבצי ה־Markdown (`hero.md`).
+
+## 3. `admin/index.html`
+ `admin/index.html`
+```html
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netlify CMS Admin</title>
+  <!-- Netlify Identity widget -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Netlify CMS core -->
+  <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
+  <style>
+    body, html { margin:0; padding:0; height:100%; }
+    #nc-root { height:100%; }
+  </style>
+</head>
+<body>
+  <div id="nc-root"></div>
+  <script>
+    // 1. אתחול Netlify Identity
+    if (window.netlifyIdentity) {
+      netlifyIdentity.init();
+      // 2. כשה־Identity מוכן (ושוחזר משתמש), ה־CMS יטען אוטומטית config.yml
+      netlifyIdentity.on('init', user => {
+        CMS.init();
+      });
+    } else {
+      console.error('Netlify Identity לא נטען');
+    }
+  </script>
+</body>
+</html>
+```
+
+## 4. `admin/config.yml`
+```yaml
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "static/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "home"
+    label: "Homepage"
+    files:
+      - label: "Hero Section"
+        name: "hero"
+        file: "content/hero.md"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Subtitle", name: "subtitle", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Button Text", name: "btn_text", widget: "string" }
+          - { label: "Button Link", name: "btn_link", widget: "string" }
+```
+
+---
+**צעדים לביצוע:**
+1. העלה (`Commit & Push`) את כל הקבצים והספריות המפורטים (netlify.toml, admin/, content/).
+2. ב־Netlify Dashboard לחץ **Trigger deploy**.
+3. לאחר סיום ה־Deploy, פתח בכתובת:
+   ```
+   https://yoga-studio-demo.netlify.app/admin
+   ```
+4. כעת ייטען מסך ה־CMS עם כפתורי **Sign up** / **Login** — תוכל לערוך את `hero.md` ישירות מהממשק.
+
+אם אחרי זה `/admin` עדיין לא נטען, ודא שאין קבצים מקומיים (כמו index.html נוסף) בתיקיית content או admin שמונעים הפנייה נכונה.
 
