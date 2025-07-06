@@ -1,0 +1,20 @@
+backend:
+  name: git-gateway
+  branch: main  # או הענף הראשי שלך
+
+media_folder: "static/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "home"
+    label: "Homepage"
+    files:
+      - label: "Hero Section"
+        name: "hero"
+        file: "content/hero.md"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Subtitle", name: "subtitle", widget: "string" }
+          - { label: "Description", name: "description", widget: "text" }
+          - { label: "Button Text", name: "btn_text", widget: "string" }
+          - { label: "Button Link", name: "btn_link", widget: "string" }
