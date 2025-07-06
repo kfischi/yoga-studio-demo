@@ -2,64 +2,66 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Content Manager</title>
-  <!-- Netlify Identity widget -->
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Netlify CMS Admin</title>
+  <!-- Load Netlify CMS and Identity Widget -->
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Netlify CMS core -->
   <script src="https://unpkg.com/netlify-cms@^2/dist/netlify-cms.js"></script>
-  <style>
-    /* וודא שה־CMS מתפרש במלוא המסך */
-    body, html { margin:0; height:100%; }
-    #nc-root { height:100%; }
-  </style>
+  <style>body, html { margin:0; padding:0; height:100%; } #nc-root { height:100%; }</style>
 </head>
 <body>
+  <!-- Container for Netlify CMS -->
   <div id="nc-root"></div>
   <script>
-    // 1. אתחול Netlify Identity
+    // Initialize Identity
     if (window.netlifyIdentity) {
-      window.netlifyIdentity.init();
+      netlifyIdentity.init();
     } else {
-      console.error('Netlify Identity not loaded');
+      console.error('Netlify Identity not available');
     }
 
-    // 2. רק אחרי שה־Identity מוכן, אתחול ה-CMS
-    window.netlifyIdentity.on('login', () => {
-      CMS.init({
-        config: {
-          backend: { name: 'git-gateway', branch: 'main' },
-          media_folder: 'static/uploads',
-          public_folder: '/uploads',
-          collections: [
-            {
-              name: 'home',
-              label: 'Homepage',
-              files: [
-                {
-                  label: 'Hero Section',
-                  name: 'hero',
-                  file: 'content/hero.md',
-                  fields: [
-                    { label: 'Title', name: 'title', widget: 'string' },
-                    { label: 'Subtitle', name: 'subtitle', widget: 'string' },
-                    { label: 'Description', name: 'description', widget: 'text' },
-                    { label: 'Button Text', name: 'btn_text', widget: 'string' },
-                    { label: 'Button Link', name: 'btn_link', widget: 'string' }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      });
+    // Wait for Identity to be ready then init CMS
+    netlifyIdentity.on('init', user => {
+      initCMS();
     });
 
-    // 3. אם המשתמש כבר מחובר, אתחול מיד
-    window.netlifyIdentity.on('init', user => {
-      if (user) {
-        CMS.init({ /* כאמור למעלה */ });
-      }
+    // Also init on login (in case reloading after signup)
+    netlifyIdentity.on('login', () => {
+      initCMS();
     });
+
+    function initCMS() {
+      // Only init once
+      if (window.CMS) {
+        CMS.init({
+          config: {
+            backend: { name: 'git-gateway', branch: 'main' },
+            media_folder: 'static/uploads',
+            public_folder: '/uploads',
+            collections: [
+              {
+                name: 'home',
+                label: 'Homepage',
+                files: [
+                  {
+                    label: 'Hero Section',
+                    name: 'hero',
+                    file: 'content/hero.md',
+                    fields: [
+                      { label: 'Title', name: 'title', widget: 'string' },
+                      { label: 'Subtitle', name: 'subtitle', widget: 'string' },
+                      { label: 'Description', name: 'description', widget: 'text' },
+                      { label: 'Button Text', name: 'btn_text', widget: 'string' },
+                      { label: 'Button Link', name: 'btn_link', widget: 'string' }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        });
+      }
+    }
   </script>
 </body>
 </html>
